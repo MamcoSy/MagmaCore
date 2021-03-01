@@ -1,0 +1,47 @@
+{
+  "name": "mamadou/magma-core",
+  "description": "A simple php framework for building web applications",
+  "readme": "",
+  "time": "",
+  "keywords": [
+    "magmacore",
+    "php",
+    "framework"
+  ],
+  "support": {
+    "source": "https://github.com/MamcoSy/MagmaCore",
+    "wiki": "https://github.com/MamcoSy/MagmaCore/wiki",
+    "issues": "https://github.com/MamcoSy/MagmaCore/issues"
+  },
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "MamcoSy",
+      "email": "mamco.aly.sy@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "minimum-stability": "alpha",
+  "require": {
+    "php": ">=7.4",
+    "ext-pdo": "*",
+    "ext-xml": "*",
+    "ext-imap": "*",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-iconv": "*",
+    "ext-mysql": "*",
+    "ext-mbstring": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "MagmaCore\\": "./src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MagmaCore\\Tests\\": "./tests"
+    }
+  }
+}
