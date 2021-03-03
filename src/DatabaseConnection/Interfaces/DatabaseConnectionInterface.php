@@ -19,4 +19,10 @@ interface DatabaseConnectionInterface
      * @return void
      */
     public function close(): void;
+
+    /**
+     * Check if connection is closed
+     * @return bool
+     */
+    public function is_closed(): bool;
 }

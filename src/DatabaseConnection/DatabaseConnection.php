@@ -13,7 +13,8 @@ class DatabaseConnection implements DatabaseConnectionInterface
 {
     protected  ? PDO $pdoInstance;
     protected array $credentials;
-    protected array $pdoParameters = [
+
+    protected const PDO_PARAMETERS = [
         PDO::ATTR_EMULATE_PREPARES   => false,
         PDO::ATTR_PERSISTENT         => true,
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
@@ -35,20 +36,17 @@ class DatabaseConnection implements DatabaseConnectionInterface
     public function open() : PDO
     {
 
-        if ( $this->pdoInstance ) {
+        if ( $this->is_closed() ) {
 
             try {
                 $this->pdoInstance = new PDO(
                     $this->credentials['dsn'],
                     $this->credentials['username'],
                     $this->credentials['password'],
-                    $this->pdoParameters
+                    self::PDO_PARAMETERS
                 );
             } catch ( PDOException $e ) {
-                throw new DatabaseConnectionException(
-                    $e->getMessage(),
-                    (int) $e->getCode()
-                );
+                throw new DatabaseConnectionException( $e->getMessage(), (int) $e->getCode() );
             }
 
         }
@@ -59,6 +57,17 @@ class DatabaseConnection implements DatabaseConnectionInterface
     /**
      * @inheritDoc
      */
-    public function close(): void {}
+    public function close(): void
+    {
+        $this->pdoInstance = null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function is_closed(): bool
+    {
+        return is_null( $this->pdoInstance );
+    }
 
 }
