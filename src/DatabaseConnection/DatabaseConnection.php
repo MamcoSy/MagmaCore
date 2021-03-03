@@ -5,7 +5,6 @@ declare ( strict_types = 1 );
 namespace MagmaCore\DatabaseConnection;
 
 use PDO;
-use PDOException;
 use MagmaCore\DatabaseConnection\Exceptions\DatabaseConnectionException;
 use MagmaCore\DatabaseConnection\Interfaces\DatabaseConnectionInterface;
 
@@ -45,7 +44,7 @@ class DatabaseConnection implements DatabaseConnectionInterface
                     $this->credentials['password'],
                     self::PDO_PARAMETERS
                 );
-            } catch ( PDOException $e ) {
+            } catch ( \Throwable $e ) {
                 throw new DatabaseConnectionException( $e->getMessage(), (int) $e->getCode() );
             }
 
