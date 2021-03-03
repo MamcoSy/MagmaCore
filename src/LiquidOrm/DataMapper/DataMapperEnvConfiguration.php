@@ -51,13 +51,7 @@ class DataMapperEnvConfiguration
      */
     public function getDatabaseCredentials( string $driver ): array
     {
-        $credentialArray = [];
-
-        if ( in_array( $driver, $this->credentials ) ) {
-            return $this->credentials[$driver];
-        }
-
-        return $credentialArray;
+        return isset( $this->credentials[$driver] ) ? $this->credentials[$driver] : [];
     }
 
 }

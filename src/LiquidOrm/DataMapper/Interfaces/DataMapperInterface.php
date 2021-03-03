@@ -23,12 +23,12 @@ interface DataMapperInterface
 
     /**
      * Bind parameters to the prepare query
-     * @param  array                 $fields
+     * @param  array                 $parameters
      * @param  boolean               $is_search
      * @throws DataMapperException
      * @return void
      */
-    public function bindParameters( array $fields, bool $isSearch );
+    public function bindParameters( array $parameters, bool $is_search );
 
     /**
      * Return number of rows affected by (SELECT, UPDATE, DELETE, INSERT) query

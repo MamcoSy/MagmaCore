@@ -31,11 +31,11 @@ class DataMapper implements DataMapperInterface
      * @param  string                $errorMessage
      * @throws DataMapperException
      */
-    private function isEmpty( $value, string $errorMessage )
+    private function isEmpty( $value )
     {
 
         if ( empty( $value ) ) {
-            throw new DataMapperException( $errorMessage );
+            throw new DataMapperException( 'Invalid value. it should not be empty' );
         }
 
     }
@@ -50,7 +50,7 @@ class DataMapper implements DataMapperInterface
     {
 
         if ( ! is_array( $value ) ) {
-            throw new DataMapperException( 'values should be an array' );
+            throw new DataMapperException( 'Invalid value . it should be an array' );
         }
 
     }
@@ -60,11 +60,7 @@ class DataMapper implements DataMapperInterface
      */
     public function prepare( string $sqlQuery ) : self
     {
-        $pdoStatement = $this
-            ->databaseConnection
-            ->open()
-            ->prepare( $sqlQuery )
-        ;
+        $this->pdoStatement = $this->databaseConnection->open()->prepare( $sqlQuery );
 
         return $this;
     }
@@ -105,18 +101,17 @@ class DataMapper implements DataMapperInterface
      * @param  array                 $values
      * @throws DataMapperException
      */
-    protected function bindValues(
-        array $fields,
-        bool $isSearch
-    ): PDOStatement {
-        $this->isArray( $fields );
+    protected function bindValues( array $parameters, bool $is_search ): PDOStatement
+    {
+        $this->isArray( $parameters );
+        $this->isEmpty( $parameters );
 
-        foreach ( $fields as $key => $value ) {
+        foreach ( $parameters as $key => $value ) {
             $this
                 ->pdoStatement
                 ->bindValue(
                     ':' . $key,
-                    ( $isSearch === false ) ? $value : '%' . $value . '%',
+                    ( $is_search === false ) ? $value : '%' . $value . '%',
                     $this->getBindType( $value )
                 )
             ;
@@ -128,11 +123,11 @@ class DataMapper implements DataMapperInterface
     /**
      * @inheritDoc
      */
-    public function bindParameters( array $fields, bool $isSearch )
+    public function bindParameters( array $fields, bool $is_search = false )
     {
         $this->isArray( $fields );
 
-        if ( $this->bindValues( $fields, $isSearch ) ) {
+        if ( $this->bindValues( $fields, $is_search ) ) {
             return $this;
         }
 
@@ -145,7 +140,7 @@ class DataMapper implements DataMapperInterface
     {
 
         if ( $this->pdoStatement ) {
-            return $this->pdoStatement->execute();
+            $this->pdoStatement->execute();
         }
 
     }
@@ -157,9 +152,10 @@ class DataMapper implements DataMapperInterface
     {
 
         if ( $this->pdoStatement ) {
-            return (int) $this->pdoStatement->rowCount();
+            return $this->pdoStatement->rowCount();
         }
 
+        return 0;
     }
 
     /**
@@ -193,21 +189,25 @@ class DataMapper implements DataMapperInterface
     public function lastInsertedId(): int
     {
         try {
-            $connection = $this->databaseConnection->open();
+            $lastId = $this->databaseConnection->open()->lastInsertId();
 
-            if ( $connection ) {
-                $lastId = $connection->lastInsertId();
-
-                if ( ! empty( $lastId ) ) {
-                    return (int) $lastId;
-                }
-
+            if ( ! empty( $lastId ) ) {
+                return (int) $lastId;
             }
 
         } catch ( Throwable $th ) {
             throw new DataMapperException( $th->getMessage() );
         }
 
+    }
+
+    /**
+     * @param array $conditions
+     * @param array $parameters
+     */
+    public function buildQueryParameters( array $conditions, array $parameters )
+    {
+        return ( ! empty( $parameters ) || ! empty( $conditions ) ) ? array_merge( $conditions, $parameters ) : $parameters;
     }
 
 }

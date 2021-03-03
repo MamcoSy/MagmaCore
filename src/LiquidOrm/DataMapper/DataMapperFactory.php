@@ -15,16 +15,17 @@ class DataMapperFactory
      * @param DatabaseConnectionInterface $databaseConnection
      * @param DataMapperEnvConfiguration  $dataMapperEnvConfiguration
      */
-    public function create(
-        string $databaseConnectionString,
-        string $dataMapperEnvConfigurationString
-    ) {
+    public function create( string $databaseConnectionString, string $dataMapperEnvConfigurationString )
+    {
+        $credentials = ( new $dataMapperEnvConfigurationString( [
+            'mysql' => [
+                'dsn'      => 'mysql:host=127.0.0.1;dbname=test',
+                'username' => 'root',
+                'password' => 'tiger',
+            ],
+        ] ) )->getDatabaseCredentials( 'mysql' );
 
-        $credentials = ( new $dataMapperEnvConfigurationString( [] ) )
-            ->getDatabaseCredentials( 'mysql' )
-        ;
-        $databaseConnection = new
-            $databaseConnectionString( $credentials );
+        $databaseConnection = new $databaseConnectionString( $credentials );
 
         if ( ! $databaseConnection instanceof DatabaseConnectionInterface ) {
             throw new DataMapperException(
@@ -35,6 +36,7 @@ class DataMapperFactory
             );
         }
 
+        return new DataMapper( $databaseConnection );
     }
 
 }
